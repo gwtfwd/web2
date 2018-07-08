@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+
+<sqlMap namespace="Park">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="parkSearchVO" type="egovframework.example.park.service.ParkSearchVO"/>
+
+
+	<!-- property : 자바변수명  column : db컬럼명 -->
+	
+	<resultMap id="park" class="egovframework.example.park.service.ParkVO">
+		<result property="id" column="id"/>
+		<result property="code" column="code"/>
+		<result property="name" column="name"/>
+		<result property="parkTypeCode" column="park_type_code"/>
+		<result property="addressRoad" column="address_road"/>
+		<result property="addressJibun" column="address_jibun"/>
+		<result property="latitude" column="latitude"/>
+		<result property="longitude" column="longitude"/>
+		<result property="area" column="area"/>
+		<result property="registeredId" column="registered_id" nullValue="0"/>
+		<result property="updatedId" column="updated_id" nullValue="0"/>
+		<result property="registeredAt" column="registered_at"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<!-- 글 목록 조회 -->
+	<select id="parkDAO.selectParkList" parameterClass="parkSearchVO" resultClass="egovMap">
+		
+		select 	id, code, name, park_type_code, address_road, address_jibun
+           		, latitude, longitude, area, registered_id, registered_at
+           		, updated_id, updated_at
+        from park where 1=1
+		
+		<isEqual prepend="AND" property="searchCondition" compareValue="0">
+			code like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		<isEqual prepend="AND" property="searchCondition" compareValue="1">
+			name like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		
+		order by id desc
+		limit #recordCountPerPage# offset #firstIndex#
+	</select>
+
+	<!-- 글 총 개수 조회 -->
+	<select id="parkDAO.selectParkListTotCnt" parameterClass="parkSearchVO" resultClass="int">
+		
+		select count(*) totcnt from park where 1=1
+		
+		<isEqual prepend="AND" property="searchCondition" compareValue="0">
+			code like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		<isEqual prepend="AND" property="searchCondition" compareValue="1">
+			name like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		
+	</select>
+
+	<!-- 등록 -->
+	<insert id="parkDAO.insertPark">
+		<![CDATA[
+			INSERT INTO PARK 
+				( code
+				  , name
+				  , park_type_code
+				  , address_road
+				  , address_jibun
+				  , latitude
+				  , longitude
+				  , area
+				  , registered_id
+				  , registered_at )
+			VALUES ( #code#
+				  , #name#
+				  , #parkTypeCode#
+				  , #addressRoad#
+				  , #addressJibun#
+				  , #latitude#
+				  , #longitude#
+				  , #area#
+				  , #registeredId#
+				  , now() )
+		]]>
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="parkDAO.updatePark">
+		<![CDATA[
+			UPDATE PARK
+			SET code=#code#
+				, name=#name#
+				, park_type_code=#parkTypeCode#
+				, address_road=#addressRoad#
+				, address_jibun=#addressJibun#
+				, latitude=#latitude#
+				, longitude=#longitude#
+				, area=#area#
+				, registered_id=#registeredId#
+				, registered_at=now()
+				, updated_id=#updatedId#
+				, updated_at=now()
+			WHERE id=#id#
+		]]>
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="parkDAO.deletePark">
+		<![CDATA[
+			DELETE FROM PARK 
+			WHERE id=#id#
+		]]>
+	</delete>
+    
+	<!-- 글 조회 -->
+	<select id="parkDAO.selectPark" resultMap="park">
+        <![CDATA[
+            select 	id, code, name, park_type_code, address_road, address_jibun
+            		, latitude, longitude, area, registered_id, registered_at
+            		, updated_id, updated_at
+            from park where id=#id#
+        ]]>
+    </select>
+
+</sqlMap>

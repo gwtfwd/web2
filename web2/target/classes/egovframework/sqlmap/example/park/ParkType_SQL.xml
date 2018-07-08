@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+
+<sqlMap namespace="ParkType">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="parkSearchVO" type="egovframework.example.park.service.ParkSearchVO"/>
+
+
+	<!-- property : 자바변수명  column : db컬럼명 -->
+	
+	<resultMap id="parkType" class="egovframework.example.parkType.service.ParkTypeVO">
+		<result property="code" column="code"/>
+		<result property="name" column="name"/>
+		<result property="registeredId" column="registered_id"/>
+		<result property="updatedId" column="updated_id" nullValue="0"/>
+		<result property="registeredAt" column="registered_at"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<!-- 글 목록 조회 -->
+	<select id="parkTypeDAO.selectParkTypeList" parameterClass="parkSearchVO" resultClass="egovMap">
+		
+		select 	code, name, registered_id, registered_at from park_type where 1=1
+		
+		<isEqual prepend="AND" property="searchCondition" compareValue="0">
+			code like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		<isEqual prepend="AND" property="searchCondition" compareValue="1">
+			name like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		
+		order by code desc
+		limit #recordCountPerPage# offset #firstIndex#
+	</select>
+
+	<!-- 글 총 개수 조회 -->
+	<select id="parkTypeDAO.selectParkTypeListTotCnt" parameterClass="parkSearchVO" resultClass="int">
+		
+		select count(*) totcnt from park_type where 1=1
+		
+		<isEqual prepend="AND" property="searchCondition" compareValue="0">
+			code like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		<isEqual prepend="AND" property="searchCondition" compareValue="1">
+			name like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		
+	</select>
+
+	<!-- 등록 -->
+	<insert id="parkTypeDAO.insertParkType">
+		<![CDATA[
+			INSERT INTO park_type 
+				( code
+				  , name
+				  , registered_id
+				  , registered_at )
+			VALUES ( #code#
+				  , #name#
+				  , #registeredId#
+				  , now() )
+		]]>
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="parkTypeDAO.updateParkType">
+		<![CDATA[
+			UPDATE park_type
+			SET code=#code#
+				, name=#name#
+				, registered_id=#registeredId#
+				, registered_at=now()
+			WHERE code=#code#
+		]]>
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="parkTypeDAO.deleteParkType">
+		<![CDATA[
+			DELETE FROM park_type
+			WHERE code=#code#
+		]]>
+	</delete>
+    
+	<!-- 글 조회 -->
+	<select id="parkTypeDAO.selectParkType" resultMap="parkType">
+        <![CDATA[
+            select 	code, name, registered_id, registered_at, updated_id, updated_at from park_type where code=#code#
+        ]]>
+    </select>
+
+</sqlMap>

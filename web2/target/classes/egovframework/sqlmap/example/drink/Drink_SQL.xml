@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Drink">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="findVO" type="egovframework.example.drink.service.DrinkDefaultVO"/>
+
+	<resultMap id="drink" class="egovframework.example.drink.service.DrinkVO">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="description" column="description"/>
+		<result property="useYn" column="use_yn"/>
+		<result property="regUser" column="reg_user"/>
+	</resultMap>
+	
+	<!-- 글 목록 조회 -->
+	<select id="drinkDAO.selectDrinkList" parameterClass="findVO" resultClass="egovMap">
+		
+		select ID, NAME, DESCRIPTION, USE_YN, REG_USER from drink where 1=1
+		
+		<isEqual prepend="AND" property="searchCondition" compareValue="0">
+			ID like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		<isEqual prepend="AND" property="searchCondition" compareValue="1">
+			NAME like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		
+		order by ID desc
+		limit #recordCountPerPage# offset #firstIndex#
+	</select>
+	
+	<!-- 글 총 개수 조회 -->
+	<select id="drinkDAO.selectDrinkListTotCnt" parameterClass="findVO" resultClass="int">
+		
+		select count(*) totcnt from drink where 1=1
+		
+		<isEqual prepend="AND" property="searchCondition" compareValue="0">
+			ID like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		<isEqual prepend="AND" property="searchCondition" compareValue="1">
+			NAME like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		
+	</select>
+	
+	<!-- 등록 -->
+	<insert id="drinkDAO.insertDrink">
+		<![CDATA[
+			insert into drink (ID, NAME, DESCRIPTION, USE_YN, REG_USER) values (#id#, #name#, #description#, #useYn#, #regUser# )
+		]]>
+	</insert>
+	
+	<!-- 수정 --> 
+	<update id="drinkDAO.updateDrink">
+		<![CDATA[
+			update drink set ID=#id#, NAME=#name#, DESCRIPTION=#description#, USE_YN=#useYn# where ID=#id#
+		]]>
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="drinkDAO.deleteDrink">
+		<![CDATA[
+			delete from drink where ID=#id#
+		]]>
+	</delete>
+	
+	<!-- 글 조회 -->
+	<select id="drinkDAO.selectDrink" resultMap="drink">
+        <![CDATA[
+            select ID, NAME, DESCRIPTION, USE_YN, REG_USER from drink where ID=#id#
+        ]]>
+    </select>
+		
+</sqlMap>	
+	
+	
+	
+	
+	
